@@ -8,7 +8,7 @@ from typing import Dict, List, OrderedDict, Union
 
 from dotenv import dotenv_values
 
-version = '1.0.0'
+version = '1.0.2'
 
 
 @dataclass
@@ -69,16 +69,35 @@ class Marker:
         self._month: int = 0
         self._day: int = 0
 
-        marker_path = path_join(cash_book_path, 'marker.md')
-        if not exists(marker_path):
+        self._marker_path = path_join(cash_book_path, 'marker.md')
+        if not exists(self._marker_path):
             return
 
-        with open(marker_path, 'r') as f:
+        with open(self._marker_path, 'r') as f:
             m = self.expr.match(f.read().strip())
             if m:
                 self._year = int(m.group(1))
                 self._month = int(m.group(2))
                 self._day = int(m.group(3))
+
+    def set_new_marker(self, date_str: str):
+        m = self.expr.match(date_str)
+        if not m:
+            return
+
+        year = int(m.group(1))
+        month = int(m.group(2))
+        day = int(m.group(3))
+
+        if year > self._year or \
+                (year == self._year and month > self._month) or \
+                (year == self._year and month == self._month and day > self._day):
+            self._year = year
+            self._month = month
+            self._day = day
+
+            with open(self._marker_path, 'w') as f:
+                f.write(date_str)
 
     @property
     def year(self):
@@ -317,6 +336,10 @@ def import_to_cashbook():
 
     for date, records in daily_records.items():
         importer.import_to_cashbook(records)
+
+    dates = list(daily_records.keys())
+    if dates:
+        marker.set_new_marker(dates[-1])
 
 
 if '__main__' == __name__:
