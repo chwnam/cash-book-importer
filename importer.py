@@ -10,6 +10,7 @@ from dotenv import dotenv_values
 
 version = '1.0.0'
 
+
 @dataclass
 class Config:
     def __init__(self, config: Dict):
@@ -246,8 +247,7 @@ class WooriParser(Parser):
         )
 
         # 문자메시지에서 기록된 날짜를 기준으로
-        entry.timestamp = f'{record.timestamp[0:4]}-{parts[1].replace('/', '-')}T{parts[0]}'
-
+        entry.timestamp = '{}-{}T{}'.format(record.timestamp[0:4], parts[1].replace('/', '-'), parts[0])
         entry.package = record.package
         entry.title = ' '.join(parts[-2:5:-1])
         entry.description = ''
