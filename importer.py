@@ -221,10 +221,10 @@ class WooriParser(Parser):
 
         parts = record.text.split(' ')
 
-        if len(parts) < 8 and not ('[입금]' == parts[0] or '[출금]' == parts[1]):
+        if len(parts) < 8 and not ('[입금]' == parts[0] or '[출금]' == parts[0] or '[출금취소]' == parts[0]):
             return None
 
-        factor: int = 1 if '[입금]' == parts[0] else -1
+        factor: int = 1 if '[입금]' == parts[0] or '[출금취소]' == parts[0] else -1
 
         parts.reverse()
         # 0: 시간
